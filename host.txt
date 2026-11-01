@@ -1,0 +1,8 @@
++ nproc
+4
++ free -h
+               total        used        free      shared  buff/cache   available
+Mem:            15Gi       921Mi        14Gi        43Mi       921Mi        14Gi
+Swap:          3.0Gi          0B       3.0Gi
++ ls -l /dev/kvm
+crw-rw---- 1 root kvm 10, 232 Nov  1 20:36 /dev/kvm
