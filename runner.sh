@@ -18,15 +18,17 @@ echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sud
 sudo udevadm control --reload-rules; sudo udevadm trigger --name-match=kvm
 ls -l /dev/kvm
 export ANDROID_SDK_ROOT=$ANDROID_HOME
+export ANDROID_AVD_HOME=/tmp/w/avdh; mkdir -p $ANDROID_AVD_HOME
+(pip install -q uiautomator2 > /tmp/w/pip.log 2>&1 &)
 SDKM=$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager
 AVDM=$ANDROID_HOME/cmdline-tools/latest/bin/avdmanager
-IMG="system-images;android-34;google_apis;x86_64"
+IMG="system-images;android-34;google_apis_playstore;x86_64"
 yes | $SDKM --licenses > /dev/null
 $SDKM "platform-tools" "emulator" "$IMG" > /tmp/w/sdk.log 2>&1; tail -3 /tmp/w/sdk.log
 echo no | $AVDM create avd -n wa -k "$IMG" -d pixel_6 --force
-printf 'hw.ramSize=4096\nhw.keyboard=yes\ndisk.dataPartition.size=8G\n' >> ~/.android/avd/wa.avd/config.ini
+printf 'hw.ramSize=4096\nhw.keyboard=yes\ndisk.dataPartition.size=8G\n' >> $ANDROID_AVD_HOME/wa.avd/config.ini
 export PATH=$ANDROID_HOME/platform-tools:$ANDROID_HOME/emulator:$PATH
-nohup $ANDROID_HOME/emulator/emulator -avd wa -no-window -noaudio -no-boot-anim -gpu swiftshader_indirect -no-snapshot -cores 3 -camera-back none -camera-front none > /tmp/w/emu.log 2>&1 &
+setsid nohup $ANDROID_HOME/emulator/emulator -avd wa -no-window -noaudio -no-boot-anim -gpu swiftshader_indirect -no-snapshot -cores 3 -camera-back none -camera-front none > /tmp/w/emu.log 2>&1 < /dev/null &
 adb wait-for-device
 for i in $(seq 1 120); do [ "$(adb shell getprop sys.boot_completed 2>/dev/null | tr -d '\r')" = "1" ] && break; sleep 5; done
 echo BOOTED=$(adb shell getprop sys.boot_completed)
