@@ -1,0 +1,23 @@
+name: run
+on:
+  workflow_dispatch:
+    inputs:
+      th:
+        description: sha256 of the control token
+        required: true
+      minutes:
+        description: how long to keep the phone alive
+        default: "150"
+permissions:
+  contents: write
+jobs:
+  phone:
+    runs-on: ubuntu-latest
+    timeout-minutes: 200
+    steps:
+      - uses: actions/checkout@v4
+      - name: phone
+        env:
+          TH: ${{ inputs.th }}
+          MINUTES: ${{ inputs.minutes }}
+        run: bash runner.sh
