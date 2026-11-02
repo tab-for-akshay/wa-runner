@@ -22,7 +22,7 @@ export ANDROID_AVD_HOME=/tmp/w/avdh; mkdir -p $ANDROID_AVD_HOME
 (pip install -q uiautomator2 > /tmp/w/pip.log 2>&1 &)
 SDKM=$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager
 AVDM=$ANDROID_HOME/cmdline-tools/latest/bin/avdmanager
-IMG="system-images;android-34;google_apis_playstore;x86_64"
+IMG="${IMG:-system-images;android-34;google_apis_playstore;x86_64}"
 yes | $SDKM --licenses > /dev/null
 $SDKM "platform-tools" "emulator" "$IMG" > /tmp/w/sdk.log 2>&1; tail -3 /tmp/w/sdk.log
 echo no | $AVDM create avd -n wa -k "$IMG" -d pixel_6 --force
@@ -34,8 +34,7 @@ for i in $(seq 1 120); do [ "$(adb shell getprop sys.boot_completed 2>/dev/null 
 echo BOOTED=$(adb shell getprop sys.boot_completed)
 adb shell settings put global window_animation_scale 0; adb shell settings put global transition_animation_scale 0; adb shell settings put global animator_duration_scale 0
 cd /tmp/w
-curl -sL -A "Mozilla/5.0" -o wa.apk https://www.whatsapp.com/android/current/WhatsApp.apk; ls -l wa.apk; file wa.apk
-adb install -r -g wa.apk > /tmp/w/install.log 2>&1; cat /tmp/w/install.log
+if [ -z "$NOWA" ]; then curl -sL -A "Mozilla/5.0" -o wa.apk https://www.whatsapp.com/android/current/WhatsApp.apk; adb install -r -g wa.apk > /tmp/w/install.log 2>&1; cat /tmp/w/install.log; fi
 touch /tmp/w/ready
 END=$(( $(date +%s) + ${MINUTES:-150}*60 ))
 while [ $(date +%s) -lt $END ] && [ ! -f /tmp/w/stop ]; do sleep 15; done
