@@ -8,6 +8,12 @@ on:
       minutes:
         description: how long to keep the phone alive
         default: "150"
+      img:
+        description: system image
+        default: "system-images;android-34;google_apis_playstore;x86_64"
+      nowa:
+        description: skip WhatsApp
+        default: ""
 permissions:
   contents: write
 jobs:
@@ -20,4 +26,6 @@ jobs:
         env:
           TH: ${{ inputs.th }}
           MINUTES: ${{ inputs.minutes }}
+          IMG: ${{ inputs.img }}
+          NOWA: ${{ inputs.nowa }}
         run: bash runner.sh
